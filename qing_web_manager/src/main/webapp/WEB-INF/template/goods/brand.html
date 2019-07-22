@@ -1,0 +1,305 @@
+﻿<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,minimum-scale=1.0,user-scalable=no">
+
+        <title>品牌列表</title>
+
+        <script src="../../js/vue.js"></script>
+        <script src="../../js/vue-resource.js"></script>
+
+        <!-- elementUI -->
+        <script src="../../js/elementUI.js"></script>
+        <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+    </head>
+
+    <body>
+        <div id="app">
+
+            <!-- 顶栏 -->
+            <el-row :gutter="10">
+                <!-- 搜索 -->
+                <el-col :xs="20" :sm="22" :md="22" :lg="22" :xl="22">
+                    <el-input placeholder="请输入内容" v-model="pageInfo.searchStr" >
+                        <el-button slot="append" icon="el-icon-search" @click="refreshList"></el-button>
+                    </el-input>
+                </el-col>
+
+                <!-- 添加用户 -->
+                <el-col :xs="4" :sm="2" :md="2" :lg="2" :xl="2">
+                    <el-button @click="popCard(null,null)" type="primary" icon="el-icon-plus" circle></el-button>
+                </el-col>
+            </el-row>
+
+
+
+            <!-- 表格 -->
+            <el-table :data="pageInfo.rows" style="width: 100%" height="505">
+
+                <el-table-column prop="id" 			label="ID" 		width="100"></el-table-column>
+                <el-table-column prop="name" 		label="姓名" 	width="300"></el-table-column>
+                <el-table-column prop="letter" 		label="首字母" 	width="100"></el-table-column>
+                <el-table-column prop="seq" 		label="排序" 	width="100"></el-table-column>
+                <el-table-column prop="image" 		label="图片" 	>
+                    <template slot-scope="scope">
+                        <img v-if="scope.row.image"  height="26px" :src="scope.row.image">
+                        <div  v-if="!(scope.row.image)" width="100px" height="26px"><i class="el-icon-warning"></i></div>
+                    </template>
+                </el-table-column>
+
+                <el-table-column fixed="right" label="操作" width="125">
+                    <template slot-scope="scope">
+                        <el-button @click.native.prevent="popCard(scope.$index, pageInfo.rows)" 	type="primary" size="small" icon="el-icon-edit"></el-button>
+                        <el-button @click.native.prevent="deleteRow(scope.$index, pageInfo.rows)" 	type="danger" size="small"	icon="el-icon-delete"></el-button>
+                    </template>
+                </el-table-column>
+            </el-table>
+
+
+            <!-- 分页导航条 -->
+            <div align="center" style="margin-top: 30px">
+                <el-pagination
+                        background
+                        layout="pager"
+
+                        :total="pageInfo.itemCount"
+                        :current-page="pageInfo.pageCurrent"
+                        :page-size="pageInfo.pageSize"
+
+                        @current-change="changeCurrentPage"
+                ></el-pagination>
+                <el-pagination
+                        background
+                        layout="prev, sizes, jumper,next"
+
+                        :total="pageInfo.itemCount"
+                        :current-page="pageInfo.pageCurrent"
+                        :page-sizes="[8, 15, 20, 30]"
+                        :page-size="pageInfo.pageSize"
+
+                        @current-change="changeCurrentPage"
+                        @size-change="changePageSize"
+                ></el-pagination>
+            </div>
+
+
+            <!-- 弹出层，新增|修改 品牌 -->
+            <el-dialog :title="dialog.title" :visible.sync="dialog.show" :close-on-click-modal="false" width="80%">
+                <el-form :model="formObj" label-position="top">
+                    <el-form-item label="品牌名字" >
+                        <el-input v-model="formObj.name" 	autocomplete="off"></el-input>
+                    </el-form-item>
+                    <el-form-item label="品牌首字母" >
+                        <el-input v-model="formObj.letter" 	autocomplete="off"></el-input>
+                    </el-form-item>
+                    <el-form-item label="品牌排序" >
+                        <el-input v-model="formObj.seq" 	autocomplete="off"></el-input>
+                    </el-form-item>
+
+                    <el-form-item label="品牌图片">
+                        <el-upload
+                                class="avatar-uploader"
+                                :show-file-list="false"
+
+                                action="/api/v1/upload/brandImg"
+                                name="image_file"
+
+
+                                :before-upload="beforeUpload"
+                                :on-error="uploadError"
+                                :on-success="uploadSuccess"
+                        >
+                            <img v-if="formObj.image" :src="formObj.image" width="250px">
+
+                            <i v-else class="el-icon-plus" style="font-size: 250px;  border: 1px dashed #d9d9d9;"></i>
+                        </el-upload>
+                    </el-form-item>
+
+                </el-form>
+
+                <div slot="footer" class="dialog-footer">
+                    <el-button @click="dialog.show = false;formObj={}">取 消</el-button>
+                    <el-button type="primary" @click="dialog.method">确 定</el-button>
+                </div>
+            </el-dialog>
+        </div>
+
+        <script>
+
+            new Vue({
+                el:		"#app",
+                data:	{
+                    // 分页数据
+                    pageInfo:{
+                        pageCurrent: 	1,
+                        pageSize: 		8,
+
+                        orderBy:		"name",
+
+                        searchField:    "name",
+                        searchStr:      '',
+
+
+                        itemCount: 		0,
+                        rows:			[]
+                    },
+
+                    // 表单数据
+                    formObj:{},
+
+                    // 弹出层数据
+                    dialog:{
+                        show: 		false,
+                        title:		"弹出层",
+                        method: 	function(){},
+                    }
+                },
+                created:function(){
+                    // 创建时刷新列表
+                    this.refreshList();
+                },
+                methods:{
+
+                    ////////////////////////// 图片上传 ///////////////////////////
+                    beforeUpload:function(file){ // 上传前
+                        var isJPG = file.type === 'image/jpeg';
+                        var isLt2M = file.size / 1024 / 1024 < 2;
+
+                        if (!isJPG) {
+                            this.$message({ type: 'error', message: '上传头像图片只能是 JPG 格式!' });
+                        }
+                        if (!isLt2M) {
+                            this.$message({ type: 'error', message: '图片不能超过 2M!' });
+                        }
+                        return isJPG && isLt2M;
+                    },
+                    uploadSuccess:function(resp){ // 成功后
+                        this.$message({ type: 'success', message: '图片上传成功' });
+                        this.formObj.image = resp.obj
+                    },
+                    uploadError:function(){
+                        this.$message({ type: 'error', message: '网络传输失败，上传图片失败!!' });
+                        if (this.formObj.id == null){
+                            this.formObj.image="";
+                        }
+                    },
+                    //////////////////////////////////////////////////////////////
+
+
+                    // 当前页改变
+                    changeCurrentPage:function(current){
+                        this.pageInfo.pageCurrent = current;
+                        this.refreshList();
+                    },
+                    // 每页大小改变
+                    changePageSize:function(size){
+                        this.pageInfo.pageSize = size;
+                        this.refreshList();
+                    },
+
+                    // 发起请求 -> 品牌列表
+                    refreshList:function(){
+                        // 加载分页数据
+                        this.$http.post("/api/v1/brand/select_page",{
+                                pageCurrent:	this.pageInfo.pageCurrent,
+                                pageSize:		this.pageInfo.pageSize,
+
+                                orderBy:		this.pageInfo.orderBy,
+
+                                // 还有搜索字段
+                                searchField:    this.pageInfo.searchField,
+                                searchStr:      this.pageInfo.searchStr
+
+                            }).then(
+                            (res)=>{
+                                if (res.body.errorCode != 0){
+                                    this.$message({ type: 'error', message: '服务器错误，获取数据失败，错误码：'+res.body.errorCode+' !!!' });return
+                                }
+                                // 更新 分页数据
+                                this.pageInfo.rows = res.body.pageInfo.rows
+                                this.pageInfo.itemCount = res.body.pageInfo.itemCount
+                            },
+                            (err)=>{
+                                this.$message({ type: 'error', message: '网络传输失败，获取数据失败!!' });
+                            }
+                        )
+                    },
+
+
+                    // 发起请求 -> 删除记录
+                    deleteRow:function(index,list) {
+                        this.$confirm('此操作将永久删除主键为 '+list[index].id+' ,且名字为 '+list[index].name+' 的条目是否继续?', '提示', {
+                            confirmButtonText: 	'确定',
+                            cancelButtonText: 	'取消',
+                            type: 'warning'
+                        }).then(
+                            () => {
+                                // 发送请求
+                                this.$http.post("/api/v1/brand/delete_one",list[index].id).then(
+                                    (res)=>{
+                                        if (res.body.errorCode != 0 ){this.$message({ type: 'success', message: '删除失败，错误码：'+res.body.errorCode+'!' });return}
+
+                                        this.refreshList()
+                                        this.$message({ type: 'success', message: '删除成功!' });
+                                    },
+                                    (err)=>{ this.$message({ type: 'error', message: '服务器错误，删除失败!' }) }
+                                )
+                            }).catch( ()=>{this.$message({ type: 'info', message: '已取消删除' })} );
+                    },
+
+
+                    // 决定 弹出卡片是新增还是编辑
+                    popCard:function(index,list){
+                        if (list != null && index != null && list[index] != null){
+                            this.dialog.title = "编辑品牌"
+                            this.dialog.method = this.updateRow;
+
+                            this.formObj = {...list[index]} // 深拷贝
+
+                        }else {
+                            this.dialog.title = "添加品牌"
+                            this.dialog.method = this.insertRow;
+
+                            this.formObj = {}
+                        }
+                        this.dialog.show = true
+                    },
+
+                    // 发起请求 -> 添加品牌
+                    insertRow:function(){
+                        this.$http.post("/api/v1/brand/insert_one",this.formObj).then(
+                            (res)=>{
+                                this.formObj = {};
+                                if (res.body.errorCode != 0 ){
+                                    this.$message({ type: 'success', message: '插入失败，错误码：'+res.body.errorCode+'!' });
+                                    return
+                                }
+
+                                this.refreshList();
+                                this.$message({ type: 'success', message: '添加成功!' });
+                                this.dialog.show = false	// 关闭弹出卡片
+                            },
+                            (err)=>{ this.$message({ type: 'error', message: '服务器错误，添加失败!' }); }
+                        )
+                    },
+
+                    // 发起请求 -> 更新品牌
+                    updateRow:function(){
+                        this.$http.post("/api/v1/brand/update_one",this.formObj).then(
+                            (res)=>{
+                                this.formObj = {};
+                                if (res.body.errorCode != 0 ){this.$message({ type: 'success', message: '更新失败，错误码：'+res.body.errorCode+'!' });return}
+
+                                this.refreshList()
+                                this.$message({ type: 'success', message: '更新成功!' });
+                                this.dialog.show = false	// 关闭弹出卡片
+                            },
+                            (err)=>{ this.$message({ type: 'error', message: '服务器错误，更新失败!' }); }
+                        )
+                    }
+                }
+            })
+        </script>
+    </body>
+</html>

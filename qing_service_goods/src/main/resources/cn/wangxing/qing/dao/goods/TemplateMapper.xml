@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="cn.wangxing.qing.dao.goods.TemplateMapper">
+
+    <select id="refreshSpecNum" parameterType="long">
+        UPDATE tb_template SET spec_num=(SELECT COUNT(0) FROM tb_spec WHERE template_id=#{value}) WHERE id=#{value};
+    </select>
+
+
+    <select id="refreshPareNum" parameterType="long">
+        UPDATE tb_template SET para_num=(SELECT COUNT(0) FROM tb_para WHERE template_id=#{value}) WHERE id=#{value};
+    </select>
+
+    
+    <!--<resultMap id="completeTemplate" type="cn.wangxing.qing.pojo.goods.Template">
+
+        <id     property="id"       column="id"/>
+        <result property="name"     column="name"/>
+        <result property="specNum"  column="specNum"/>
+        <result property="paraNum"  column="paraNum"/>
+
+        <collection property="specList" ofType="cn.wangxing.qing.pojo.goods.Spec"
+                    select="getSpecList" column="id"/>
+
+        <collection property="paraList" ofType="cn.wangxing.qing.pojo.goods.Para"
+                    select="getParaList" column="id"/>
+
+    </resultMap>
+
+    <select id="selectByPage" resultMap="completeTemplate">
+        SELECT  *
+        FROM    tb_template
+        <where>
+            <if test="template.name != null">
+                name LIKE '%${template.name}%'
+            </if>
+        </where>
+        <if test="orderBy != null and orderBy != ''">
+            ORDER BY orderBy
+        </if>
+    </select>
+
+    <select id="getSpecList" parameterType="long" resultType="cn.wangxing.qing.pojo.goods.Spec">
+        SELECT * FROM tb_spec WHERE id = #{value}
+    </select>
+
+    <select id="getParaList" parameterType="long" resultType="cn.wangxing.qing.pojo.goods.Para">
+        SELECT * FROM tb_para WHERE id = #{value}
+    </select>-->
+
+</mapper>

@@ -1,0 +1,396 @@
+﻿<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,minimum-scale=1.0,user-scalable=no">
+	<title>品牌列表</title>
+
+	<script src="../../js/vue.js"></script>
+	<script src="../../js/vue-resource.js"></script>
+
+	<!-- elementUI -->
+	<script src="../../js/elementUI.js"></script>
+	<link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+
+	<!--<link rel="stylesheet" href="../../css/elementUI.css">-->
+
+	<script>
+
+
+	</script>
+
+</head>
+
+<body>
+<div id="app" v-loading="tableLoading" element-loading-text="拼命加载中" element-loading-spinner="el-icon-loading" element-loading-background="rgba(0, 0, 0, 0.8)">
+
+	<!-- 顶栏 -->
+	<el-row :gutter="10">
+		<!-- 搜索 -->
+		<el-col :xs="20" :sm="22" :md="22" :lg="22" :xl="22">
+			<el-input placeholder="请输入内容" v-model="pageInfo.searchStr" >
+				<el-button slot="append" icon="el-icon-search" @click="refreshList"></el-button>
+			</el-input>
+		</el-col>
+
+		<!-- 添加模板 -->
+		<el-col :xs="4" :sm="2" :md="2" :lg="2" :xl="2">
+			<el-button @click="popCard(null,0)" type="primary" icon="el-icon-plus" circle></el-button>
+		</el-col>
+	</el-row>
+
+
+	<!-- 表格 -->
+	<el-table :data="pageInfo.rows" style="width: 100%" height="505" >
+
+		<el-table-column prop="id" 			label="ID" 		width="100"></el-table-column>
+		<el-table-column prop="name" 	fixed="left"	label="姓名" 	width="200"></el-table-column>
+
+		<el-table-column  					label="规格" 	width="350"><template slot-scope="scope">
+			<el-tag v-for="spec in scope.row.specList"
+					:key="spec.id"
+					closable
+					:disable-transitions="false"
+					type="success"
+					effect="plain"
+					@close="deleteOne('/api/v1/spec/delete_one',spec)"
+					@click="popCard(spec,1)"
+
+					>{{spec.name}}
+			</el-tag>
+			<el-button class="button-new-tag" size="small" @click="popCard(null,1,scope.row.id);">+</el-button>
+		</template></el-table-column>
+
+		<el-table-column label="参数" 	min-width="350"><template slot-scope="scope">
+			<el-tag
+					v-for="para in scope.row.paraList"
+					:key="para.id"
+					closable
+					:disable-transitions="false"
+					effect="plain"
+					@close="deleteOne('/api/v1/para/delete_one',para)"
+					@click="popCard(para,2)"
+					>{{para.name}}
+			</el-tag>
+			<el-button class="button-new-tag" size="small" @click="popCard(null,2,scope.row.id)">+</el-button>
+		</template></el-table-column>
+
+		<el-table-column  label="操作" width="125">
+			<template slot-scope="scope">
+				<el-button @click.native.prevent="popCard(scope.row,0)" 	type="primary" size="small" icon="el-icon-edit"></el-button>
+				<el-button @click.native.prevent="deleteOne('/api/v1/template/delete_one',scope.row)" 	type="danger" size="small"	icon="el-icon-delete"></el-button>
+			</template>
+		</el-table-column>
+	</el-table>
+
+
+	<!-- 分页导航条 -->
+	<div align="center" style="margin-top: 30px">
+		<el-pagination
+				background
+				layout="pager"
+
+				:total="pageInfo.itemCount"
+				:current-page="pageInfo.pageCurrent"
+				:page-size="pageInfo.pageSize"
+
+				@current-change="changeCurrentPage"
+		></el-pagination>
+		<el-pagination
+				background
+				layout="prev, sizes, jumper,next"
+
+				:total="pageInfo.itemCount"
+				:current-page="pageInfo.pageCurrent"
+				:page-sizes="[8, 15, 20, 30]"
+				:page-size="pageInfo.pageSize"
+
+				@current-change="changeCurrentPage"
+				@size-change="changePageSize"
+		></el-pagination>
+	</div>
+
+
+	<!-- 模板修改 -->
+	<el-dialog title="模板修改" :visible.sync="dialog.show == 0" :close-on-click-modal="false" width="80%" v-loading="tFormLoading" element-loading-text="拼命加载中" element-loading-spinner="el-icon-loading" element-loading-background="rgba(0, 0, 0, 0.8)">
+		<el-form :model="formObj" label-position="top">
+			<el-form-item label="模板名字" >
+				<el-input v-model="formObj.name" 	autocomplete="off"></el-input>
+			</el-form-item>
+		</el-form>
+		<div slot="footer" class="dialog-footer">
+			<el-button @click="dialog.show = -1;formObj={}">取 消</el-button>
+			<el-button type="primary" @click="dialog.method(dialog.api,formObj)">确 定</el-button>
+		</div>
+	</el-dialog>
+
+	<!-- 规格修改 -->
+	<el-dialog :title="dialog.title" :visible.sync="dialog.show == 1" :close-on-click-modal="false" width="80%">
+		<el-form :model="formObj" label-position="top">
+			<el-form-item label="所属模板">
+				<el-input v-model="formObj.template_id" 	autocomplete="off" :disabled="true"></el-input>
+			</el-form-item>
+			<el-form-item label="规格名字" >
+				<el-input v-model="formObj.name" 	autocomplete="off"></el-input>
+			</el-form-item>
+			<el-form-item label="规格排序" >
+				<el-input v-model="formObj.seq" 	autocomplete="off"></el-input>
+			</el-form-item>
+
+			<el-form-item label="规格值" >
+				<el-input v-model="formObj.options" 	autocomplete="off"></el-input>
+			</el-form-item>
+		</el-form>
+		<div slot="footer" class="dialog-footer">
+			<el-button @click="dialog.show = -1;formObj={}">取 消</el-button>
+			<el-button type="primary" @click="dialog.method(dialog.api,formObj)">确 定</el-button>
+		</div>
+	</el-dialog>
+
+	<!-- 参数修改 -->
+	<el-dialog :title="dialog.title" :visible.sync="dialog.show == 2"  :close-on-click-modal="false" width="80%">
+		<el-form :model="formObj" label-position="top">
+			<el-form-item label="所属模板">
+				<el-input v-model="formObj.template_id" :disabled="true"	autocomplete="off"></el-input>
+			</el-form-item>
+			<el-form-item label="参数名字">
+				<el-input v-model="formObj.name" 	autocomplete="off"></el-input>
+			</el-form-item>
+			<el-form-item label="参数排序" >
+				<el-input v-model="formObj.seq" 	autocomplete="off"></el-input>
+			</el-form-item>
+
+			<el-form-item label="参数值" >
+				<el-input v-model="formObj.options" 	autocomplete="off"></el-input>
+			</el-form-item>
+		</el-form>
+		<div slot="footer" class="dialog-footer">
+			<el-button @click="dialog.show = -1;formObj={}">取 消</el-button>
+			<el-button type="primary" @click="dialog.method(dialog.api,formObj)">确 定</el-button>
+		</div>
+	</el-dialog>
+
+
+<!--	<el-input
+			class="input-new-tag"
+			v-if="inputVisible"
+			v-model="inputValue"
+			ref="saveTagInput"
+			size="small"
+			@keyup.enter.native="handleInputConfirm"
+			@blur="handleInputConfirm"
+	>
+	</el-input>-->
+</div>
+
+<script>
+
+	new Vue({
+		el:		"#app",
+		data:	{
+			// 分页数据
+			pageInfo:{
+				pageCurrent: 	1,
+				pageSize: 		8,
+
+				orderBy:		"name",
+
+				searchField:	"name",
+				searchStr:		'',
+
+				itemCount: 		0,
+				rows:			[]
+			},
+
+			// 等待动画
+			tableLoading: 	true,
+			tFormLoading:	true,
+
+
+			// 表单数据
+			formObj:{},
+
+			// 弹出层数据
+			dialog:{
+				show: 		-1,
+				title:		"弹出层",
+				method: 	function(){},
+				api:		""
+			},
+		},
+		created:function(){
+			// 创建时刷新列表
+			this.refreshList();
+		},
+		methods:{
+
+			// 当前页改变
+			changeCurrentPage:function(current){
+				this.pageInfo.pageCurrent = current;
+				this.refreshList();
+			},
+			// 每页大小改变
+			changePageSize:function(size){
+				this.pageInfo.pageSize = size;
+				this.refreshList();
+			},
+
+			// 发起请求 -> 品牌列表 yes dong
+			refreshList:function(){
+
+					this.tableLoading = true;
+					// 加载分页数据
+					this.$http.post("/api/v1/template/select_page",this.pageInfo).then(
+							(res)=>{
+								if (res.body.errorCode != 0){
+									this.$message({ type: 'error', message: '服务器错误，获取数据失败，错误码：'+res.body.errorCode+' !!!' });return
+									this.tableLoading = false;
+								}
+								// 更新 分页数据
+								this.pageInfo.rows = res.body.pageInfo.rows
+								this.pageInfo.itemCount = res.body.pageInfo.itemCount
+								this.tableLoading = false;
+							},
+							(err)=>{
+								this.$message({ type: 'error', message: '网络传输失败，获取数据失败!!' });
+								this.tableLoading = false;
+							}
+					)
+			},
+
+			// 决定 弹出卡片是新增还是编辑
+			popCard:function(obj,target,template_id){
+
+
+				// 打开相应面板
+				this.dialog.show = target;
+				if (target == 0){
+					if(obj != null){
+						this.selectOne("/api/v1/template/select_one",obj.id);
+						this.dialog.title = "编辑模板";
+						this.dialog.method = this.updateOne;
+						this.dialog.api = "/api/v1/template/update_one"
+					}else {
+						this.formObj = {};
+						this.dialog.title = "添加模板";
+						this.dialog.method = this.insertOne;
+						this.dialog.api = "/api/v1/template/insert_one"
+					}
+				}
+				if (target == 1){
+					if(obj != null){
+						this.selectOne("/api/v1/spec/select_one",obj.id);
+						this.dialog.title = "编辑规格";
+						this.dialog.method = this.updateOne;
+						this.dialog.api = "/api/v1/spec/update_one";
+					}else {
+						this.dialog.title = "添加规格";
+						this.dialog.method = this.insertOne;
+						this.dialog.api = "/api/v1/spec/insert_one";
+						this.formObj = {template_id:template_id};
+					}
+				}
+				if (target == 2){
+					if(obj != null){
+						this.selectOne("/api/v1/para/select_one",obj.id);
+						this.dialog.title = "编辑参数";
+						this.dialog.method = this.updateOne;
+						this.dialog.api = "/api/v1/para/update_one";
+					}else {
+						this.dialog.title = "添加参数";
+						this.dialog.method = this.insertOne;
+						this.dialog.api = "/api/v1/para/insert_one";
+						this.formObj = {template_id:template_id};
+					}
+				}
+			},
+
+
+			// 插入
+			insertOne:function(api,obj){
+				this.$http.post(api,obj).then(
+						(res)=>{
+							if ( res.body.errorCode == 0 ){
+								this.formObj = {};
+								this.refreshList();
+								this.$message({ type: 'success', message: '添加成功!' });
+								this.dialog.show = -1;	// 关闭弹出卡片
+							}else {
+								this.$message({ type: 'error', message: '添加失败，错误码：'+res.body.errorCode+'!' });
+							}
+						},
+						(err)=>{ this.$message({ type: 'error', message: '网络错误，添加失败!' }); }
+				)
+			},
+
+			// 更新
+			updateOne:function(api,obj){
+
+				this.$http.post(api,obj).then(
+					(res)=>{
+
+						if ( res.body.errorCode == 0 ){
+							this.formObj = {};
+							this.refreshList();
+							this.$message({ type: 'success', message: '更新成功!' });
+							this.dialog.show = -1;	// 关闭弹出卡片
+						}else {
+							this.$message({ type: 'error', message: '更新失败，错误码：'+res.body.errorCode+'!' });
+						}
+					},
+					(err)=>{ this.$message({ type: 'error', message: '网络错误，更新失败!' }); }
+				)
+			},
+
+			// 删除
+			deleteOne:function(api,obj){
+
+				console.log(api)
+				console.log(obj)
+
+				this.$confirm('即将删除 id='+obj.id+',name='+obj.name+' 的元素是否继续?', '提示', {
+					confirmButtonText: 	'确定',
+					cancelButtonText: 	'取消',
+					type: 'warning'
+				}).then(() => {
+					this.$http.post(api,obj.id).then(
+						(res)=>{
+							if ( res.body.errorCode == 0 ){
+								this.$message({ type: 'success', message: '删除成功!' });
+								this.refreshList();
+							}else {
+								this.$message({ type: 'error', message: '删除失败，错误码：'+res.body.errorCode+'!' });
+							}
+						},
+						(err)=>{ this.$message({ type: 'error', message: '网络错误，删除失败!' }); }
+					)
+				}).catch(() => {
+					this.$message({ type: 'info', message: '已取消删除' });
+				});
+			},
+
+
+			// 查询
+			selectOne:function(api,id){
+
+
+				this.$http.post(api,id).then(
+
+					(res)=>{
+
+						if ( res.body.errorCode == 0 ){
+							this.formObj = res.body.obj;
+						}else {
+							this.$message({ type: 'error', message: '获取失败，错误码：'+res.body.errorCode+'!' });
+						}
+					},
+					(err)=>{ this.$message({ type: 'error', message: '网络错误，获取失败!' });}
+				)
+			}
+
+
+		}
+	})
+</script>
+</body>
+</html>
