@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="cn.wangxing.qing.dao.system.AdminMapper">
+
+    <resultMap id="completeAdmin" type="cn.wangxing.qing.pojo.system.Admin">
+        <id     property="id"           column="id"/>
+        <result property="loginName"    column="login_name"/>
+        <result property="password"     column="password"/>
+        <result property="status"       column="status"/>
+        <collection property="roleList" ofType="cn.wangxing.qing.pojo.system.Role">
+            <id     property="id"       column="id"/>
+            <result property="name"     column="name"/>
+        </collection>
+    </resultMap>
+
+    <select id="selectByUsername" parameterType="string" resultMap="completeAdmin">
+        SELECT  a.id,
+                a.login_name,
+                a.password,
+                a.status,
+
+                r.id r_id,
+                r.name
+
+        FROM    tb_admin a
+            LEFT OUTER JOIN tb_admin_role ar ON a.id=ar.admin_id
+            LEFT OUTER JOIN tb_role r        ON r.id=ar.role_id
+        WHERE   a.login_name = #{value}
+    </select>
+</mapper>

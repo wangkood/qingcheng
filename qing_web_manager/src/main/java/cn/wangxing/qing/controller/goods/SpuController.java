@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
  * 商品信息
  */
 @RestController
-@RequestMapping("/api/v1/sku")
+@RequestMapping("/api/v1/spu")
 public class SpuController extends BaseController<Spu> {
 
     @Reference

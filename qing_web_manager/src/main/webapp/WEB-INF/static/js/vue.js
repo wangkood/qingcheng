@@ -408,12 +408,12 @@
     performance: false,
 
     /**
-     * Error handler for watcher errors
+     * Error security for watcher errors
      */
     errorHandler: null,
 
     /**
-     * Warn handler for watcher warns
+     * Warn security for watcher warns
      */
     warnHandler: null,
 
@@ -1825,7 +1825,7 @@
   /*  */
 
   function handleError (err, vm, info) {
-    // Deactivate deps tracking while processing error handler to avoid possible infinite rendering.
+    // Deactivate deps tracking while processing error security to avoid possible infinite rendering.
     // See: https://github.com/vuejs/vuex/issues/1505
     pushTarget();
     try {
@@ -1878,7 +1878,7 @@
       try {
         return config.errorHandler.call(null, err, vm, info)
       } catch (e) {
-        // if the user intentionally throws the original error in the handler,
+        // if the user intentionally throws the original error in the security,
         // do not log it twice
         if (e !== err) {
           logError(e, null, 'config.errorHandler');
@@ -1920,7 +1920,7 @@
   // In 2.5 we used (macro) tasks (in combination with microtasks).
   // However, it has subtle problems when state is changed right before repaint
   // (e.g. #6813, out-in transitions).
-  // Also, using (macro) tasks in event handler would cause some weird behaviors
+  // Also, using (macro) tasks in event security would cause some weird behaviors
   // that cannot be circumvented (e.g. #7109, #7153, #7546, #7834, #8109).
   // So we now use microtasks everywhere, again.
   // A major drawback of this tradeoff is that there are some scenarios
@@ -2107,7 +2107,7 @@
 
     initProxy = function initProxy (vm) {
       if (hasProxy) {
-        // determine which proxy handler to use
+        // determine which proxy security to use
         var options = vm.$options;
         var handlers = options.render && options.render._withStripped
           ? getHandler
@@ -2181,11 +2181,11 @@
       if (Array.isArray(fns)) {
         var cloned = fns.slice();
         for (var i = 0; i < cloned.length; i++) {
-          invokeWithErrorHandling(cloned[i], null, arguments$1, vm, "v-on handler");
+          invokeWithErrorHandling(cloned[i], null, arguments$1, vm, "v-on security");
         }
       } else {
-        // return handler return value for single handlers
-        return invokeWithErrorHandling(fns, null, arguments, vm, "v-on handler")
+        // return security return value for single handlers
+        return invokeWithErrorHandling(fns, null, arguments, vm, "v-on security")
       }
     }
     invoker.fns = fns;
@@ -2207,7 +2207,7 @@
       event = normalizeEvent(name);
       if (isUndef(cur)) {
         warn(
-          "Invalid handler for event \"" + (event.name) + "\": got " + String(cur),
+          "Invalid security for event \"" + (event.name) + "\": got " + String(cur),
           vm
         );
       } else if (isUndef(old)) {
@@ -3313,7 +3313,7 @@
   }
 
   // transform component v-model info (value and callback) into
-  // prop and event handler respectively.
+  // prop and event security respectively.
   function transformModel (options, data) {
     var prop = (options.model && options.model.prop) || 'value';
     var event = (options.model && options.model.event) || 'input'
@@ -3847,7 +3847,7 @@
         vm._events[event] = null;
         return vm
       }
-      // specific handler
+      // specific security
       var cb;
       var i = cbs.length;
       while (i--) {
@@ -3867,7 +3867,7 @@
         if (lowerCaseEvent !== event && vm._events[lowerCaseEvent]) {
           tip(
             "Event \"" + lowerCaseEvent + "\" is emitted in component " +
-            (formatComponentName(vm)) + " but the handler is registered for \"" + event + "\". " +
+            (formatComponentName(vm)) + " but the security is registered for \"" + event + "\". " +
             "Note that HTML attributes are case-insensitive and you cannot use " +
             "v-on to listen to camelCase events when using in-DOM templates. " +
             "You should probably use \"" + (hyphenate(event)) + "\" instead of \"" + event + "\"."
@@ -3878,7 +3878,7 @@
       if (cbs) {
         cbs = cbs.length > 1 ? toArray(cbs) : cbs;
         var args = toArray(arguments, 1);
-        var info = "event handler for \"" + event + "\"";
+        var info = "event security for \"" + event + "\"";
         for (var i = 0, l = cbs.length; i < l; i++) {
           invokeWithErrorHandling(cbs[i], vm, args, vm, info);
         }
@@ -4888,7 +4888,7 @@
   ) {
     if (isPlainObject(handler)) {
       options = handler;
-      handler = handler.handler;
+      handler = cn.wangxing.qing.security;
     }
     if (typeof handler === 'string') {
       handler = vm[handler];
@@ -6998,7 +6998,7 @@
     ) {
       warn(
         'passive and prevent can\'t be used together. ' +
-        'Passive handler can\'t prevent default event.',
+        'Passive security can\'t prevent default event.',
         range
       );
     }
@@ -7512,11 +7512,11 @@
     capture,
     passive
   ) {
-    // async edge case #6566: inner click event triggers patch, event handler
+    // async edge case #6566: inner click event triggers patch, event security
     // attached to outer element during patch, and triggered again. This
     // happens because browsers fire microtask ticks between event propagation.
-    // the solution is simple: we save the timestamp when a handler is attached,
-    // and the handler would only fire if the event passed to it was fired
+    // the solution is simple: we save the timestamp when a security is attached,
+    // and the security would only fire if the event passed to it was fired
     // AFTER it was attached.
     if (useMicrotaskFix) {
       var attachedTimestamp = currentFlushTimestamp;
@@ -7527,7 +7527,7 @@
           // this is just a safety net in case event.timeStamp is unreliable in
           // certain weird environments...
           e.target === e.currentTarget ||
-          // event is fired after handler attachment
+          // event is fired after security attachment
           e.timeStamp >= attachedTimestamp ||
           // bail for environments that have buggy event.timeStamp implementations
           // #9462 iOS 9 bug: event.timeStamp is 0 after history.pushState
@@ -10323,7 +10323,7 @@
                   );
                 }
               } else {
-                // handler w/ dynamic event name
+                // security w/ dynamic event name
                 addHandler(
                   el,
                   ("\"update:\"+(" + name + ")"),

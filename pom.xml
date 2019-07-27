@@ -14,6 +14,10 @@
 
         <module>qing_service_goods</module>
         <module>qing_web_manager</module>
+        <module>qing_service_user</module>
+        <module>qing_service_system</module>
+        <module>qing_web_portal</module>
+        <module>qing_service_business</module>
     </modules>
     <packaging>pom</packaging>
 

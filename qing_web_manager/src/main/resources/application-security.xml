@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans
+        xmlns:beans="http://www.springframework.org/schema/beans"
+        xmlns:dubbo="http://code.alibabatech.com/schema/dubbo"
+        xmlns="http://www.springframework.org/schema/security"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="
+            http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+            http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security.xsd
+            http://code.alibabatech.com/schema/dubbo http://code.alibabatech.com/schema/dubbo/dubbo.xsd
+">
+
+   <!-- 一下资源 无需加入安全管理 -->
+   <http pattern="/js/vue.js"          security="none"/>
+   <http pattern="/js/vue-resource.js" security="none"/>
+   <http pattern="/js/elementUI.js"    security="none"/>
+
+  <!-- <http pattern="/css/login_style.css"  security="none"/>
+   <http pattern="/css/theme-chalk.css"  security="none"/>
+
+   <http pattern="/img/theme-chalk.css"  security="none"/>-->
+
+
+   <http pattern="/login"              security="none"/>
+   <http pattern="/doLogin"              security="none"/>
+
+   <http>
+      <intercept-url pattern="/**" access="hasRole( 'ROLE_商品管理员' )"/>
+      <form-login login-page="/login"
+                  login-processing-url="/tologin"
+                  authentication-failure-handler-ref="loginFailHandler"
+                  authentication-success-handler-ref="loginSuccessHandler"
+                  default-target-url="/main" />
+      <logout/>
+      <csrf disabled="true"/>
+   </http>
+
+
+   <authentication-manager>
+      <authentication-provider user-service-ref="userDetailsService">
+         <password-encoder ref="bCryptPasswordEncoder"/>
+      </authentication-provider>
+   </authentication-manager>
+
+   <!-- 登录失败处理器 -->
+   <beans:bean id="loginFailHandler" class="cn.wangxing.qing.security.LoginFailHandler"/>
+   <beans:bean id="loginSuccessHandler" class="cn.wangxing.qing.security.LoginSuccessHandler"/>
+
+   <!-- 密码加解密 -->
+   <beans:bean id="bCryptPasswordEncoder" class="org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder"/>
+
+   <!-- 提供用户  -->
+   <beans:bean id="userDetailsService" class="cn.wangxing.qing.security.UserDetailsServiceImpl"/>
+
+
+</beans:beans>

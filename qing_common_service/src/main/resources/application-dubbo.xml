@@ -12,7 +12,7 @@
 	<dubbo:protocol name="dubbo" port="${dubbo.port}"/>
 	<dubbo:application name="${dubbo.application}" />
 	<dubbo:registry protocol="zookeeper" address="${zk.registry}" />
-	<dubbo:annotation package="cn.wangxing.qing.service.goods.impl" />
+	<dubbo:annotation package="cn.wangxing.qing.service" />
 
 
 </beans>

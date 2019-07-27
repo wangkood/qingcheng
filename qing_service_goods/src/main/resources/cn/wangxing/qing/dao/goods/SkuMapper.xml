@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="cn.wangxing.qing.dao.goods.SkuMapper">
+
+    <select id="getById" parameterType="long" resultType="cn.wangxing.qing.pojo.goods.Sku">
+        SELECT
+            k.id            id,
+            k.sn            sn,
+            k.name          name,
+            k.price         price,
+            k.num           num,
+            k.alert_num     alertNum,
+            k.image         image,
+            k.images        images,
+            k.weight        weight,
+            k.create_time   createTime,
+            k.update_time   updateTime,
+            k.spu_id         spuId,
+            k.category_id   categoryId,
+            k.category_name categoryName,
+            k.brand_name    brandName,
+            k.spec          spec,
+            k.sale_num      saleNum,
+            k.comment_num   commentNum,
+            k.status        status
+        FROM    tb_sku k
+        WHERE   k.id = #{value}
+    </select>
+</mapper>

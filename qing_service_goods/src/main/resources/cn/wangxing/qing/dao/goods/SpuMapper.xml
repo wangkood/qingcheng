@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="cn.wangxing.qing.dao.goods.SpuMapper">
+
+    <select id="getById" parameterType="long" resultType="cn.wangxing.qing.pojo.goods.Spu">
+        SELECT
+                id              id          ,
+                sn              sn          ,
+                name            name        ,
+                caption         caption     ,
+                brand_id         brandId     ,
+                category1_id     category1Id ,
+                category2_id     category2Id ,
+                category3_id     category3Id ,
+                template_id      templateId  ,
+                freight_id       freightId   ,
+                image           image       ,
+                images          images      ,
+                sale_service     saleService ,
+                introduction    introduction,
+                spec_items       specItems   ,
+                para_items       paraItems   ,
+                sale_num         saleNum     ,
+                comment_num      commentNum  ,
+                is_marketable    isMarketable,
+                is_enable_spec    isEnableSpec,
+                is_delete        isDelete    ,
+                status          status
+        FROM    tb_spu
+        WHERE   id = #{value}
+    </select>
+</mapper>

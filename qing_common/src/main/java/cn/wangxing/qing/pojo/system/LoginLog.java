@@ -2,6 +2,7 @@ package cn.wangxing.qing.pojo.system;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import java.io.Serializable;
+import java.util.Date;
 
 /**
  * loginLog实体类
@@ -27,7 +28,16 @@ public class LoginLog implements Serializable{
 
 	private java.util.Date loginTime;//登录时间
 
-	
+	public LoginLog() {}
+	public LoginLog(Integer id, String loginName, String ip, String browserName, String location, Date loginTime) {
+		this.id = id;
+		this.loginName = loginName;
+		this.ip = ip;
+		this.browserName = browserName;
+		this.location = location;
+		this.loginTime = loginTime;
+	}
+
 	public Integer getId() {
 		return id;
 	}

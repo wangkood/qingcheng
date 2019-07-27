@@ -2,6 +2,7 @@ package cn.wangxing.qing.pojo.system;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * menu实体类
@@ -11,11 +12,10 @@ import java.io.Serializable;
 @Table(name="tb_menu")
 public class Menu implements Serializable{
 
+	public static final long serialVersionUID = 4515616L;
+
 	@Id
 	private String id;//菜单ID
-
-
-	
 
 	private String name;//菜单名称
 
@@ -24,6 +24,8 @@ public class Menu implements Serializable{
 	private String url;//URL
 
 	private String parentId;//上级菜单ID
+
+	private List<Menu> child;
 
 	
 	public String getId() {
@@ -62,5 +64,11 @@ public class Menu implements Serializable{
 	}
 
 
-	
+	public List<Menu> getChild() {
+		return child;
+	}
+
+	public void setChild(List<Menu> child) {
+		this.child = child;
+	}
 }

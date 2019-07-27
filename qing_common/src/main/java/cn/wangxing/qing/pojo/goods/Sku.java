@@ -11,8 +11,10 @@ import java.io.Serializable;
 @Table(name="tb_sku")
 public class Sku implements Serializable{
 
+	private static final long serialVersionUID = 002;
+
 	@Id
-	private String id;//商品id
+	private long id;//商品id
 
 
 	
@@ -53,11 +55,40 @@ public class Sku implements Serializable{
 
 	private String status;//商品状态 1-正常，2-下架，3-删除
 
-	
-	public String getId() {
+	private Spu spu;
+
+
+	@Override
+	public String toString() {
+		return "Sku{" +
+				"id=" + id +
+				", sn='" + sn + '\'' +
+				", name='" + name + '\'' +
+				", price=" + price +
+				", num=" + num +
+				", alertNum=" + alertNum +
+				", image='" + image + '\'' +
+				", images='" + images + '\'' +
+				", weight=" + weight +
+				", createTime=" + createTime +
+				", updateTime=" + updateTime +
+				", spuId='" + spuId + '\'' +
+				", categoryId=" + categoryId +
+				", categoryName='" + categoryName + '\'' +
+				", brandName='" + brandName + '\'' +
+				", spec='" + spec + '\'' +
+				", saleNum=" + saleNum +
+				", commentNum=" + commentNum +
+				", status='" + status + '\'' +
+				", spu=" + spu +
+				'}';
+	}
+
+	public long getId() {
 		return id;
 	}
-	public void setId(String id) {
+
+	public void setId(long id) {
 		this.id = id;
 	}
 
@@ -187,6 +218,11 @@ public class Sku implements Serializable{
 		this.status = status;
 	}
 
+	public Spu getSpu() {
+		return spu;
+	}
 
-	
+	public void setSpu(Spu spu) {
+		this.spu = spu;
+	}
 }

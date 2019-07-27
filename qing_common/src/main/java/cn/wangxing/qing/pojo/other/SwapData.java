@@ -9,6 +9,9 @@ public class SwapData<T> implements Serializable {
     public static final SwapData FAIL = new SwapData("400", "FAIL ");
     public static final SwapData SERVICERROR = new SwapData("500", "SERVICE ERROR");
 
+    public static final String SUCCESS_CODE= "0";
+    public static final String EXCEPTION_CODE= "500";
+
 
     private String errorCode;
     private String message;

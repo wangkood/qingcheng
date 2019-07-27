@@ -2,6 +2,7 @@ package cn.wangxing.qing.pojo.goods;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * category实体类
@@ -30,6 +31,9 @@ public class Category implements Serializable{
 	private Integer parentId;//上级ID
 
 	private Integer templateId;//模板ID
+
+	private List<Category> childList;
+
 
 	
 	public Integer getId() {
@@ -89,5 +93,11 @@ public class Category implements Serializable{
 	}
 
 
-	
+	public List<Category> getChildList() {
+		return childList;
+	}
+
+	public void setChildList(List<Category> childList) {
+		this.childList = childList;
+	}
 }

@@ -63,7 +63,7 @@ public class BaseServiceImpl<T> implements BaseService<T> {
 
 
     // 回滚事务
-    public void rollback() {
+    public static void rollback() {
         TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();//手动开启事务回滚
     }
 
@@ -191,11 +191,12 @@ public class BaseServiceImpl<T> implements BaseService<T> {
             if (t == null) {
                 rollback();
                 return new SwapData<T>("400", "没有查到对象", null);
-            } else
+            } else{
                 return new SwapData<T>("0", "success", t);
+            }
         } catch (Exception e) {
             rollback();
-            return SwapData.SERVICERROR;
+            return new SwapData<>(SwapData.EXCEPTION_CODE,e.getMessage());
         }
     }
 

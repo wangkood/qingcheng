@@ -11,11 +11,10 @@ import java.io.Serializable;
 @Table(name="tb_spu")
 public class Spu implements Serializable{
 
+	private static final long serialVersionUID = 003L;
+
 	@Id
-	private String id;//主键
-
-
-	
+	private long id;//主键
 
 	private String sn;//货号
 
@@ -59,11 +58,12 @@ public class Spu implements Serializable{
 
 	private String status;//审核状态
 
-	
-	public String getId() {
+
+	public long getId() {
 		return id;
 	}
-	public void setId(String id) {
+
+	public void setId(long id) {
 		this.id = id;
 	}
 
