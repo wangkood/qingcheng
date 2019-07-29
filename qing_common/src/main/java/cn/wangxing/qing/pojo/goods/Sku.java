@@ -39,7 +39,7 @@ public class Sku implements Serializable{
 
 	private java.util.Date updateTime;//更新时间
 
-	private String spuId;//SPUID
+	private long spuId;//SPUID
 
 	private Integer categoryId;//类目ID
 
@@ -162,10 +162,10 @@ public class Sku implements Serializable{
 		this.updateTime = updateTime;
 	}
 
-	public String getSpuId() {
+	public long getSpuId() {
 		return spuId;
 	}
-	public void setSpuId(String spuId) {
+	public void setSpuId(long spuId) {
 		this.spuId = spuId;
 	}
 

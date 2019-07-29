@@ -8,6 +8,9 @@ import cn.wangxing.qing.service.base.impl.BaseServiceImpl;
 import cn.wangxing.qing.service.goods.SpecService;
 import com.alibaba.dubbo.config.annotation.Service;
 import org.springframework.beans.factory.annotation.Autowired;
+import tk.mybatis.mapper.entity.Example;
+
+import java.util.List;
 
 
 @Service(interfaceClass = SpecService.class)
@@ -60,5 +63,23 @@ public class SpecServiceImpl extends BaseServiceImpl<Spec> implements SpecServic
             return new SwapData<Spec>("500",e.getMessage());
         }
 
+    }
+
+    /**
+     * 更具 模板对象查找 规格
+     * @param templateId
+     * @return
+     */
+    @Override
+    public SwapData<List<Spec>> listByTemplateId(long templateId) {
+        try{
+            Example example = new Example(Spec.class);
+            example.createCriteria().andEqualTo("templateId",templateId);
+
+            List<Spec> specList = specMapper.selectByExample(example);
+            return new SwapData<List<Spec>>(SwapData.SUCCESS_CODE,"",specList);
+        }catch (Exception e){
+            return new SwapData<List<Spec>>(SwapData.EXCEPTION_CODE,e.getMessage());
+        }
     }
 }

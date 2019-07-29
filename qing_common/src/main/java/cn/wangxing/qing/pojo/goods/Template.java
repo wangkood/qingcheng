@@ -13,11 +13,10 @@ import java.util.List;
 @Table(name="tb_template")
 public class Template implements Serializable{
 
+	private static final long serialVersionUID = 41516142213L;
+
 	@Id
-	private Integer id;//ID
-
-
-	
+	private long id;//ID
 
 	private String name;//模板名称
 
@@ -25,9 +24,8 @@ public class Template implements Serializable{
 
 	private Integer paraNum;//参数数量
 
-	@Transient
 	private List<Spec> specList;
-	@Transient
+
 	private List<Para> paraList;
 
 	@Override
@@ -42,10 +40,11 @@ public class Template implements Serializable{
 				'}';
 	}
 
-	public Integer getId() {
+	public long getId() {
 		return id;
 	}
-	public void setId(Integer id) {
+
+	public void setId(long id) {
 		this.id = id;
 	}
 

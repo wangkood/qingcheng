@@ -2,6 +2,7 @@ package cn.wangxing.qing.pojo.goods;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * spu实体类
@@ -30,7 +31,7 @@ public class Spu implements Serializable{
 
 	private Integer category3Id;//三级分类
 
-	private Integer templateId;//模板ID
+	private long 	templateId;//模板ID
 
 	private Integer freightId;//运费模板id
 
@@ -57,6 +58,10 @@ public class Spu implements Serializable{
 	private String isDelete;//是否删除
 
 	private String status;//审核状态
+
+	private List<Spec> specList;
+
+	private Template template;
 
 
 	public long getId() {
@@ -116,10 +121,11 @@ public class Spu implements Serializable{
 		this.category3Id = category3Id;
 	}
 
-	public Integer getTemplateId() {
+	public long getTemplateId() {
 		return templateId;
 	}
-	public void setTemplateId(Integer templateId) {
+
+	public void setTemplateId(long templateId) {
 		this.templateId = templateId;
 	}
 
@@ -214,6 +220,19 @@ public class Spu implements Serializable{
 		this.status = status;
 	}
 
+	public List<Spec> getSpecList() {
+		return specList;
+	}
 
-	
+	public void setSpecList(List<Spec> specList) {
+		this.specList = specList;
+	}
+
+	public Template getTemplate() {
+		return template;
+	}
+
+	public void setTemplate(Template template) {
+		this.template = template;
+	}
 }

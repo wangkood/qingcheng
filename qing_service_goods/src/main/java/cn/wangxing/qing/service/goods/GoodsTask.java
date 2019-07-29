@@ -1,4 +1,4 @@
-package cn.wangxing.qing.service;
+package cn.wangxing.qing.service.goods;
 
 
 import org.springframework.scheduling.annotation.Scheduled;

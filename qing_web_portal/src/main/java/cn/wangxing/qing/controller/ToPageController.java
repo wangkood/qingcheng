@@ -2,15 +2,12 @@ package cn.wangxing.qing.controller;
 
 import cn.wangxing.qing.pojo.business.Ad;
 import cn.wangxing.qing.pojo.goods.Category;
-import cn.wangxing.qing.pojo.goods.Goods;
 import cn.wangxing.qing.pojo.goods.Sku;
 import cn.wangxing.qing.pojo.other.SwapData;
 import cn.wangxing.qing.service.business.AdService;
 import cn.wangxing.qing.service.goods.CategoryService;
-import cn.wangxing.qing.service.goods.GoodsService;
 import cn.wangxing.qing.service.goods.SkuService;
 import com.alibaba.dubbo.config.annotation.Reference;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -37,12 +34,18 @@ public class ToPageController {
     public String toIndexPage(ModelMap map){
 
         // 查询 分类数据
-        List<Category> categoryList = categoryService.list(0L);
-        map.addAttribute("categoryList",categoryList);
+        SwapData<List<Category>> treeListSwapData = categoryService.treelist(0L);
+        if(!SwapData.SUCCESS_CODE.equals(treeListSwapData.getErrorCode())){
+            return "500";
+        }
+        map.addAttribute("categoryList",treeListSwapData.getObj());
 
         // 轮播图
-        List<Ad> adList = adService.selectAll();
-        map.addAttribute("adList", adList);
+        SwapData<List<Ad>> adSwapData = adService.selectAll();
+        if (!SwapData.SUCCESS_CODE.equals(adSwapData.getErrorCode())){
+            return "500";
+        }
+        map.addAttribute("adList", adSwapData.getObj());
 
         return "index";
     }

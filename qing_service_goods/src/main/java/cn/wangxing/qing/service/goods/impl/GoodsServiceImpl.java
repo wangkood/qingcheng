@@ -15,6 +15,7 @@ import cn.wangxing.qing.service.goods.SpuService;
 import cn.wangxing.qing.util.SnowflakeIdWorker;
 import com.alibaba.dubbo.config.annotation.Service;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.transaction.annotation.Transactional;
 import tk.mybatis.mapper.entity.Example;
 
@@ -39,6 +40,9 @@ public class GoodsServiceImpl implements GoodsService {
 
     @Autowired
     SnowflakeIdWorker snowflakeIdWorker;
+
+    @Autowired
+    RedisTemplate redisTemplate;
 
 
     @Override
@@ -103,6 +107,9 @@ public class GoodsServiceImpl implements GoodsService {
             return new SwapData<Goods>("500", e.getMessage());
         }
     }
+
+
+
 
     @Override
     @Transactional

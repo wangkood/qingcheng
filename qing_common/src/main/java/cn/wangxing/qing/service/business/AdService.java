@@ -1,5 +1,6 @@
 package cn.wangxing.qing.service.business;
 import cn.wangxing.qing.pojo.business.Ad;
+import cn.wangxing.qing.pojo.other.SwapData;
 import cn.wangxing.qing.service.base.BaseService;
 
 import java.util.List;
@@ -10,5 +11,5 @@ import java.util.List;
  */
 public interface AdService extends BaseService<Ad> {
 
-    List<Ad> selectAll();
+    SwapData<List<Ad>> selectAll();
 }
