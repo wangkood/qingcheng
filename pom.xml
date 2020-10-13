@@ -25,7 +25,7 @@
     <!-- 依赖版本号 -->
     <properties>
 
-        <junit.version>4.12</junit.version>
+        <junit.version>4.13.1</junit.version>
         <spring.version>5.0.5.RELEASE</spring.version>
 
         <servlet-api.version>2.5</servlet-api.version>
